@@ -52,7 +52,8 @@ def pad_list(lst: List[T], length: int, padding_value: Callable[[], T]):
         return lst[:length]
     if len(lst) != 0:
         try:
-            to_concatenate = np.array([convert_type(padding_value()) if callable(padding_value) else convert_type(padding_value) for _ in range(len(lst), length)])
+            padding = convert_type(padding_value()) if callable(padding_value) else convert_type(padding_value)
+            to_concatenate = np.array([padding for _ in range(len(lst), length)])
             l = np.concatenate((lst, to_concatenate))
         except ValueError as e:
             print("Error padding list: " + str(e))
@@ -63,5 +64,6 @@ def pad_list(lst: List[T], length: int, padding_value: Callable[[], T]):
             raise e
         return l
     else:
-        l = np.array([convert_type(padding_value()) if callable(padding_value) else convert_type(padding_value) for _ in range(length)])
+        padding = convert_type(padding_value()) if callable(padding_value) else convert_type(padding_value)
+        l = np.array([padding for _ in range(length)])
         return l
