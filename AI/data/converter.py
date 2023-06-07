@@ -3,6 +3,7 @@ import numpy as np
 from data.proto import TaskData, PositionData, Vector2, MapType, RoleType, SystemType, TaskType
 
 import betterproto
+import typing
 
 def convert_bool(data: bool):
     return [1.0 if data else 0.0]
@@ -59,24 +60,24 @@ def convert_enum(data: betterproto.Enum):
 
 
 def convert_type(data, extra_info=None):
-    type_mapping = {
-        bool: convert_bool,
-        dict: convert_dict,
-        list: convert_list,
-        str: convert_str,
-        PositionData: convert_positiondata,
-        TaskData: convert_taskdata,
-        Vector2: convert_vector2,
-        betterproto.Message: convert_message,
-        betterproto.Enum: convert_enum,
-        int: lambda x: [x],
-        float: lambda x: [x],
-        np.ndarray: lambda x: convert_list(x.tolist()),
-    }
-    
+    type_mapping: list[tuple[typing.Type, typing.Callable]] = [
+        (bool, convert_bool),
+        (dict, convert_dict),
+        (list, convert_list),
+        (str, convert_str),
+        (PositionData, convert_positiondata),
+        (TaskData, convert_taskdata),
+        (Vector2, convert_vector2),
+        (betterproto.Message, convert_message),
+        (betterproto.Enum, convert_enum),
+        (int, lambda x: [x]),
+        (float, lambda x: [x]),
+        (np.ndarray, lambda x: convert_list(x.tolist())),
+    ]
+
     #print(extra_info)
 
-    for cls, func in type_mapping.items():
+    for cls, func in type_mapping:
         if isinstance(data, cls):
             return func(data)
         
